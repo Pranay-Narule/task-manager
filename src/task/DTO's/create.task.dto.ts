@@ -6,5 +6,4 @@ export class createTaskDto{
     // install two class
     @IsNotEmpty()
     description: string;
-    
 }

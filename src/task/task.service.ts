@@ -1,9 +1,24 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { createTaskDto } from './DTO\'s/create.task.dto';
 import { getTaskFilterDto } from './DTO\'s/get.tasks-filter.dto';
+import { taskRepository } from './task.repository';
+import { InjectRepository } from '@nestjs/typeorm';
+import { task } from './task.entity';
+import { taskStatus } from './task-status.enum';
+import { async } from 'rxjs';
 
 @Injectable()
 export class TaskService {
+
+    //use repo
+    constructor(
+        @InjectRepository(taskRepository)
+        private taskRepository: taskRepository,
+    ){}
+
+    async gettasks(filterDto: getTaskFilterDto): Promise<task[]>{
+        return this.taskRepository.getTasks(filterDto);
+    }
 
     // make this array private so no outside function can modify it
     // define values using model
@@ -30,6 +45,22 @@ export class TaskService {
     //     return tasks;
     // }
 
+    // find one return a promise so return type
+    async gettaskById(id : number): Promise<task> {
+        //any db operation is synchronus so we don't know whether it is going to end
+        // we can handle it using async await syntax so make prefix asynch and add await
+        //now we wait for this op to finished 
+        const found = await this.taskRepository.findOne(id);
+
+        if(!found){
+                    //showing not found
+                    //if want message can define
+                    // as we using this same service to update no need to provide error there
+                    throw new NotFoundException('Task with ID "${id}" not found');
+                }
+                return found;
+    }
+
     // gettaskById(id : string): task{
     //     //this function run for each task 
     //     //whenever it is true it prints the value
@@ -43,6 +74,12 @@ export class TaskService {
     //     }
     //     return found;
     // }
+
+    createTask(createTaskDto: createTaskDto): Promise<task>{
+        //no logic create method in repo for this
+        return this.taskRepository.createTask(createTaskDto);
+    }
+
 
     // createTask(createTaskDto: createTaskDto): task{
     //     //what is structure see in model
@@ -63,6 +100,13 @@ export class TaskService {
 
     // }
 
+    async deleteTaskById(id: number): Promise<void>{
+        const result = await this.taskRepository.delete(id);
+        if (result.affected === 0){
+            throw new NotFoundException('Task with ID "${id}" not found');
+        }
+    }
+    
     // deleteTaskById(id: string): void{
     //     //going to use array filter method to delete the task
     //     // when false it delete that entry
@@ -70,6 +114,15 @@ export class TaskService {
     //     this.task = this.task.filter(task => task.id !== found.id);
     // }
 
+    async updateTaskStatus(id: number, status: taskStatus): Promise<task>{
+        //search task by get task
+        const task = await this.gettaskById(id);
+        task.status = status;
+        //above save locally to save in db call save
+        await task.save();
+        return task;
+    }
+    
     // updateTaskStatus(id: string, status: taskStatus): task{
     //     const task = this.gettaskById(id);
     //     task.status = status;
