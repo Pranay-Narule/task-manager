@@ -12,7 +12,7 @@ export class TaskController {
     constructor(private taskSaervice: TaskService){}
 
     @Get()
-    getTasks(@Query() filterDto: getTaskFilterDto): task[]{
+    getTasks(@Query(ValidationPipe) filterDto: getTaskFilterDto): task[]{
        // check query parameter is not empty
        if(Object.keys(filterDto).length){
            return this.taskSaervice.getTaskWithFilters(filterDto);
