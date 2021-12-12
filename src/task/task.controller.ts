@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 import { createTaskDto } from './DTO\'s/create.task.dto';
 import { getTaskFilterDto } from './DTO\'s/get.tasks-filter.dto';
+import { taskValidationPipe } from './pipes/task.status.validation.pipe';
 import { task, taskStatus } from './task.model';
 import { TaskService } from './task.service';
 // any rq with /task handle by this controller
@@ -48,7 +49,8 @@ export class TaskController {
     @Patch('/:id/status')
     updateTaskStatus(
         @Param('id') id: string,
-        @Body('status') status: taskStatus,
+        // or can pass new name(parameter)
+        @Body('status', taskValidationPipe) status: taskStatus,
     ): task{
         return this.taskSaervice.updateTaskStatus(id, status);
     }
