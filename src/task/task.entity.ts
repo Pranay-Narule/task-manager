@@ -4,7 +4,7 @@ import {
     PrimaryGeneratedColumn,
     Column, 
 } from 'typeorm';
-import { taskStatus } from './task.model';
+import { taskStatus } from './task-status.enum';
 
 //to create entity must implement baseentity
 @Entity()

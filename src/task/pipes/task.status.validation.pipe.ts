@@ -1,5 +1,5 @@
 import { BadRequestException, PipeTransform } from "@nestjs/common";
-import { taskStatus } from "../task.model";
+import { taskStatus } from "../task-status.enum";
 
 //pass this pipe in controller
 //pipe must implement PipeTransform interface
