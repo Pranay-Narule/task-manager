@@ -50,11 +50,11 @@ export class TaskService {
     // }
 
     // find one return a promise so return type
-    async gettaskById(id : number): Promise<task> {
+    async gettaskById(id : number, user: user): Promise<task> {
         //any db operation is synchronus so we don't know whether it is going to end
         // we can handle it using async await syntax so make prefix asynch and add await
         //now we wait for this op to finished 
-        const found = await this.taskRepository.findOne(id);
+        const found = await this.taskRepository.findOne({ where: { id, userId: user.id } });
 
         if(!found){
                     //showing not found
@@ -104,8 +104,12 @@ export class TaskService {
 
     // }
 
-    async deleteTaskById(id: number): Promise<void>{
-        const result = await this.taskRepository.delete(id);
+    async deleteTaskById(
+        id: number,
+        user: user,
+        ): Promise<void>{
+            //we dont use where here
+        const result = await this.taskRepository.delete({id, userId: user.id});
         if (result.affected === 0){
             throw new NotFoundException('Task with ID "${id}" not found');
         }
@@ -118,9 +122,13 @@ export class TaskService {
     //     this.task = this.task.filter(task => task.id !== found.id);
     // }
 
-    async updateTaskStatus(id: number, status: taskStatus): Promise<task>{
+    async updateTaskStatus(
+        id: number, 
+        status: taskStatus,
+        user: user,
+        ): Promise<task>{
         //search task by get task
-        const task = await this.gettaskById(id);
+        const task = await this.gettaskById(id, user);
         task.status = status;
         //above save locally to save in db call save
         await task.save();

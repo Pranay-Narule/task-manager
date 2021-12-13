@@ -36,8 +36,11 @@ export class TaskController {
     // }
 
     @Get('/:id')
-    getTaskById( @Param('id', ParseIntPipe) id: number): Promise<task>{
-        return this.taskSaervice.gettaskById(id);
+    getTaskById( 
+        @Param('id', ParseIntPipe) id: number,
+        @GetUser() user: user,
+        ): Promise<task>{
+        return this.taskSaervice.gettaskById(id, user);
     }
 
 
@@ -69,8 +72,11 @@ export class TaskController {
 
     @Delete('/:id')
     //as we not sure we get in rq number or not this throw error if not number
-    deleteTaskById( @Param('id', ParseIntPipe) id: number): Promise<void>{
-        return this.taskSaervice.deleteTaskById(id);
+    deleteTaskById( 
+        @Param('id', ParseIntPipe) id: number,
+        @GetUser() user: user,       
+        ): Promise<void>{
+        return this.taskSaervice.deleteTaskById(id, user);
     }
 
     //or put
@@ -79,8 +85,9 @@ export class TaskController {
         @Param('id', ParseIntPipe) id: number,
         // or can pass new name(parameter)
         @Body('status', taskValidationPipe) status: taskStatus,
+        @GetUser() user: user,
     ): Promise<task>{
-        return this.taskSaervice.updateTaskStatus(id, status);
+        return this.taskSaervice.updateTaskStatus(id, status, user);
     }
 
 }
