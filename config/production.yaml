@@ -1,0 +1,9 @@
+// define this for production
+
+
+
+
+
+// rest are set in variable
+db:
+  synchronize: false

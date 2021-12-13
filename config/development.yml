@@ -1,0 +1,17 @@
+// here we can override default values in yaml file
+
+
+
+
+
+
+//this will be mearge in default.yaml file
+db:
+  host: 'localhost'
+  username: 'root'
+  password: ''
+  synchronize: true
+
+
+jwt:
+  secret: 'topSecret51'

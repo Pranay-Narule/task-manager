@@ -5,12 +5,15 @@ import { createTaskDto } from "./DTO's/create.task.dto";
 import { title } from "process";
 import { getTaskFilterDto } from "./DTO's/get.tasks-filter.dto";
 import { user } from "src/auth/user.entity";
+import { Catch, InternalServerErrorException, Logger } from "@nestjs/common";
 
 // now create repository which must extends follow
 @EntityRepository(task)
 export class taskRepository extends Repository<task>{
     //we make this repo available by module
     //leave repo emty for now letter add logic
+
+    private logger = new Logger('taskRepository');
 
     async getTasks(
         filterDto: getTaskFilterDto,
@@ -38,8 +41,15 @@ export class taskRepository extends Repository<task>{
 
 
         //now exc query
-        const tasks = await query.getMany();
-        return tasks;
+        try {
+            
+            const tasks = await query.getMany();
+            return tasks;
+        } catch (error){
+            // can print error also
+            this.logger.error(`Failed to get tasks for user "${user.username}"  DTO: ${JSON.stringify(filterDto)}`, error.stack);
+            throw new InternalServerErrorException();
+        }
     }
 
 
@@ -55,7 +65,14 @@ export class taskRepository extends Repository<task>{
         Task.status = taskStatus.OPEN;
         // after defining property in entity simply assign it here
         Task.user = user;
-        await Task.save();
+        
+        try{
+            await Task.save();
+        } catch(error){
+            this.logger.error(`Failed to create task for user "${user.username}", Data: ${createTaskDto} `, error.stack);
+            throw new InternalServerErrorException();
+        }
+        
         //as api returning all rq so
         delete Task.user;
 
