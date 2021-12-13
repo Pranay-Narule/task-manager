@@ -1,8 +1,10 @@
+import { user } from 'src/auth/user.entity';
 import { 
     BaseEntity, 
     Entity, 
     PrimaryGeneratedColumn,
-    Column, 
+    Column,
+    ManyToMany, 
 } from 'typeorm';
 import { taskStatus } from './task-status.enum';
 
@@ -21,4 +23,11 @@ export class task extends BaseEntity {
 
     @Column()
     status: taskStatus;
+
+    // as there could be many task for one user
+    @ManyToMany(type => user, user => user.tasks, { eager: false})
+    user: user;
+
+    @Column()
+    userId: number;
 }

@@ -1,4 +1,7 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Put, Query, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Put, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { GetUser } from 'src/auth/get-user.decorator';
+import { user } from 'src/auth/user.entity';
 import { createTaskDto } from './DTO\'s/create.task.dto';
 import { getTaskFilterDto } from './DTO\'s/get.tasks-filter.dto';
 import { taskValidationPipe } from './pipes/task.status.validation.pipe';
@@ -8,13 +11,19 @@ import { TaskService } from './task.service';
 // any rq with /task handle by this controller
 // cli import this in module
 @Controller('task')
+// now after auth fully config use that here
+@UseGuards(AuthGuard())
+//done our controller guarding
 export class TaskController {
     // import service in constructor
     constructor(private taskSaervice: TaskService){}
 
     @Get()
-    getTasks(@Query(ValidationPipe) filterDto: getTaskFilterDto): Promise<task[]>{
-        return this.taskSaervice.gettasks(filterDto);
+    getTasks(
+        @Query(ValidationPipe) filterDto: getTaskFilterDto,
+        @GetUser() user: user,
+        ): Promise<task[]>{
+        return this.taskSaervice.gettasks(filterDto, user);
     }
     // @Get()
     // getTasks(@Query(ValidationPipe) filterDto: getTaskFilterDto): task[]{
@@ -29,6 +38,19 @@ export class TaskController {
     @Get('/:id')
     getTaskById( @Param('id', ParseIntPipe) id: number): Promise<task>{
         return this.taskSaervice.gettaskById(id);
+    }
+
+
+    // after establish relationship use on route
+    // getuser decorator gives us entire rq in object
+    @Post()
+    @UsePipes(ValidationPipe)
+    createTask(
+        @Body() createTaskDto: createTaskDto,
+        @GetUser() user: user,
+
+    ): Promise<task>{
+        return this.taskSaervice.createTask(createTaskDto, user);
     }
 
 

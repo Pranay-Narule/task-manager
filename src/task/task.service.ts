@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { task } from './task.entity';
 import { taskStatus } from './task-status.enum';
 import { async } from 'rxjs';
+import { user } from 'src/auth/user.entity';
 
 @Injectable()
 export class TaskService {
@@ -16,8 +17,11 @@ export class TaskService {
         private taskRepository: taskRepository,
     ){}
 
-    async gettasks(filterDto: getTaskFilterDto): Promise<task[]>{
-        return this.taskRepository.getTasks(filterDto);
+    async gettasks(
+        filterDto: getTaskFilterDto,
+        user: user,
+        ): Promise<task[]>{
+        return this.taskRepository.getTasks(filterDto, user);
     }
 
     // make this array private so no outside function can modify it
@@ -75,9 +79,9 @@ export class TaskService {
     //     return found;
     // }
 
-    createTask(createTaskDto: createTaskDto): Promise<task>{
+    createTask(createTaskDto: createTaskDto, user: user): Promise<task>{
         //no logic create method in repo for this
-        return this.taskRepository.createTask(createTaskDto);
+        return this.taskRepository.createTask(createTaskDto, user);
     }
 
 
