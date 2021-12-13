@@ -18,4 +18,15 @@ export class AuthController {
     signIn(@Body(ValidationPipe) authCredentialsDto: authCredentialsDto): Promise<{ accessToken: string }>{
         return this.authService.signIn(authCredentialsDto);
     }    
+
+
+    // // how authentication it work shown here
+    // //can provide authentication on controller level and here also
+    // @Post('/test')
+    // @UseGuards(AuthGuard())
+    // // we get here entire request
+    // // test( @Req() req )
+    // test( @GetUser() User: user ){
+    //     console.log(User);
+    // }
 }
